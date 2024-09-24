@@ -16,6 +16,7 @@
 #  *   limitations under the License.
 #  *
 #  */
+{{- $context := . }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -56,11 +57,18 @@ spec:
                     - key: "app.kubernetes.io/instance"
                       operator: In
                       values:
-                        - {{ include "common.names.fullname" . }}
+                        - '{{ .Release.Name }}'
                 topologyKey: kubernetes.io/hostname
         {{- else if .Values.affinity }}
-        {{ toYaml .Values.affinity | nindent 8 }}
+        {{ tpl (toYaml .Values.affinity) $context | nindent 8 }}
         {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- tpl (toYaml .) $context  | nindent 8 }}
+      {{- end }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
       containers:
         - name: {{ include "common.names.fullname" . }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"        
@@ -69,7 +77,9 @@ spec:
           ports:
             - containerPort: {{ .Values.devportal.port }}
           env:
-            - name: SPRING_ELASTICSEARCH_REST_URIS            
+            - name: SPRING_ELASTICSEARCH_REST_URIS            # supports version 10.15 
+              value: {{ include "developerportal.elasticservice" . }}:9200
+            - name: SPRING_ELASTICSEARCH_URIS                 # supports version 11.0
               value: {{ include "developerportal.elasticservice" . }}:9200
             - name: PORTAL_SERVER_CACHE_DISTRIBUTED_CLUSTER_PEERS_0
               value: {{ include "common.names.fullname" . }}-svc:{{ .Values.devportal.clusterPorts.start }}..{{ .Values.devportal.clusterPorts.end }}              

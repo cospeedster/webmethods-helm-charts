@@ -16,7 +16,7 @@
 #  *   limitations under the License.
 #  *
 #  */
-
+{{- $context := . }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -174,7 +174,14 @@ spec:
       {{- end }}
     {{- with .Values.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
+        {{- tpl (toYaml .) $context | nindent 8 }}
+    {{- end }}
+    {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- tpl (toYaml .) $context | nindent 8 }}
+    {{- end }}
+    {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
     {{- end }}
     {{- with .Values.tolerations }}
       tolerations:
@@ -183,25 +190,46 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: data
+      {{- with .Values.storage.data.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       accessModes:
       - ReadWriteOnce
       resources:
         requests:
           storage: {{ .Values.storage.dataSize }}
+      {{- if .Values.storage.data.storageClassName }}
+      storageClassName: {{ .Values.storage.data.storageClassName | quote }}
+      {{- end }}
   - metadata:
       name: logs
+      {{- with .Values.storage.logs.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       accessModes:
       - ReadWriteOnce
       resources:
         requests:
           storage: {{ .Values.storage.logsSize }}
+      {{- if .Values.storage.logs.storageClassName }}
+      storageClassName: {{ .Values.storage.logs.storageClassName | quote }}
+      {{- end }}
   - metadata:
       name: configuration
+      {{- with .Values.storage.configuration.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       accessModes:
       - ReadWriteOnce
       resources:
         requests:
           storage: {{ .Values.storage.configurationSize }}
+      {{- if .Values.storage.configuration.storageClassName }}
+      storageClassName: {{ .Values.storage.configuration.storageClassName | quote }}
+      {{- end }}

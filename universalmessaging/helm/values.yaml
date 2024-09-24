@@ -135,6 +135,22 @@ storage:
   # -- Storage size of configuration files
   configurationSize: 2Mi
 
+  logs:
+    # -- Annotation for logs
+    annotations: {}
+    # -- Storage class name for logs
+    storageClassName: ""
+  data:
+    # -- Annotation for data
+    annotations: {}
+    # -- Storage class name for data
+    storageClassName: ""
+  configuration:
+    # -- Annotation for data
+    annotations: {}
+    # -- Storage class name for data
+    storageClassName: ""
+  
 ingress:
   # -- Enable or disable Ingress, default is disabled. On enabling Ingress, only the first `-0` replica is currently supported. 
   enabled: false
@@ -183,7 +199,15 @@ nodeSelector: {}
 
 tolerations: []
 
+# -- Set Pod (anti-) affinity. You can use templates inside because `tpl` function is called for rendering.
 affinity: {}
+
+# -- Set Pod topology spread constraints. You can use templates inside because `tpl` function is called for rendering. 
+topologySpreadConstraints: {}
+
+# -- Set UM and Nginx Pods' Priority Class Name
+# ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+priorityClassName: ""
 
 # -- Configure liveness probe
 startupProbe:

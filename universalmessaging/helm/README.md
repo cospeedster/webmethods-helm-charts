@@ -62,12 +62,15 @@ helm install um webmethods/universalmessaging
 | `1.0.3` | Make license file handling same as MSR |
 | `1.0.4` | CRD `ServiceMonitor` added |
 | `1.0.4` | `containerName` added in `values.yaml`. Default is the Chart name. (Use `helm repo update` to get latest Helm Chart version.) |
+| `1.0.5` | support of PV storage annotation and class name |
+| `1.0.6` | `tpl` function support in `affinity` value added. `topologySpreadConstraints` support added. |
+| `1.0.7` | `priorityClassName` support added. |
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | `{}` |  |
+| affinity | object | `{}` | Set Pod (anti-) affinity. You can use templates inside because `tpl` function is called for rendering. |
 | containerName | string | `nil` | The name of the main container, by default this will be Chart name. |
 | customMetricExporterConfig | object | `{"content":""}` | Custom metric JMX exporter configuration. Overwriting the default content of file [jmx_exporter.yaml](./files/jmx_exporter.yaml). See [Prometheus JMX exporter configuration](https://github.com/SoftwareAG/universalmessaging-prometheus-jmx-exporter-config) for more configuration samples. |
 | customServerConfig | object | `{"content":""}` | Custom server configuration file. Overwriting the content of file `Custom_Server_Common.conf` in container.  |
@@ -103,6 +106,7 @@ helm install um webmethods/universalmessaging
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` | pod annotations |
 | podSecurityContext.fsGroup | int | `1724` |  |
+| priorityClassName | string | `""` | Set UM and Nginx Pods' Priority Class Name ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/ |
 | prometheus | object | `{"interval":"10s","path":"/metrics","port":"9200","scheme":"http","scrape":"true","scrapeTimeout":"10s"}` | Define values for Prometheus Operator to scrap metrics via annotation or ServiceMonitor. |
 | readinessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/health/","port":9000},"initialDelaySeconds":0,"periodSeconds":15,"successThreshold":1,"timeoutSeconds":30}` | Configure readiness probe |
 | replicaCount | int | `1` | Number of replicas |
@@ -116,10 +120,17 @@ helm install um webmethods/universalmessaging
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | serviceMonitor | object | `{"enabled":false}` | Create and enable ServiceMonitor. The default is `false`. |
 | startupProbe | object | `{"failureThreshold":30,"httpGet":{"path":"/health/","port":9000},"initialDelaySeconds":30,"periodSeconds":10,"successThreshold":1,"timeoutSeconds":5}` | Configure liveness probe |
+| storage.configuration.annotations | object | `{}` | Annotation for data |
+| storage.configuration.storageClassName | string | `""` | Storage class name for data |
 | storage.configurationSize | string | `"2Mi"` | Storage size of configuration files |
+| storage.data.annotations | object | `{}` | Annotation for data |
+| storage.data.storageClassName | string | `""` | Storage class name for data |
 | storage.dataSize | string | `"2Gi"` | Storage size of data |
+| storage.logs.annotations | object | `{}` | Annotation for logs |
+| storage.logs.storageClassName | string | `""` | Storage class name for logs |
 | storage.logsSize | string | `"2Gi"` | Storage size of logs |
 | tolerations | list | `[]` |  |
+| topologySpreadConstraints | object | `{}` | Set Pod topology spread constraints. You can use templates inside because `tpl` function is called for rendering.  |
 | um.basicAuthEnable | string | `"No"` | Enable basic authentication on the server |
 | um.basicAuthMandatory | string | `"No"` | Enable and mandate basic authentication on the server |
 | um.initJavaMemSize | string | `"1024"` | Initial Java Heap Size (in MB) |

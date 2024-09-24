@@ -16,6 +16,7 @@
 #  *   limitations under the License.
 #  *
 #  */
+{{- $context := . }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -155,7 +156,14 @@ spec:
       {{- end }}
       {{- with .Values.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
+        {{- tpl (toYaml .) $context | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- tpl (toYaml .) $context | nindent 8 }}
+      {{- end }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
       {{- end }}
       {{- with .Values.tolerations }}
       tolerations:

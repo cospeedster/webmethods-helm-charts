@@ -228,7 +228,15 @@ nodeSelector: {}
 
 tolerations: []
 
+# -- Set Pod (anti-) affinity for APIGW. You can use templates inside because `tpl` function is called for rendering.
 affinity: {}
+
+# -- Set Pod topology spread constraints for APIGW. You can use templates inside because `tpl` function is called for rendering. 
+topologySpreadConstraints: {}
+
+# -- Set APIGW and Nginx Pods' Priority Class Name
+# ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+priorityClassName: ""
 
 # -- Value to add extra host aliases to APIGW container.
 hostAliases: []
@@ -532,8 +540,14 @@ elasticsearch:
   #   memory: 128Mi  
   resources: {}
 
+  # -- Request size of storage. The default is 1Gi.
   storage: ""
+
+  # -- Use the storage class.
   storageClassName: ""
+
+  # -- Annotations of PVC storage
+  storageAnnotations: {}
 
   # -- The secret name that holds the sag es user for API Gateway.
   secretName: ""
@@ -592,7 +606,16 @@ elasticsearch:
   # -- The name of the secret holding the tls secret
   # By default the name will be fullname of release + "es-tls-secret"
   certificateSecretName: "{{ include \"common.names.fullname\" .}}-es-tls-secret"
-  
+
+  # -- Set Pod (anti-) affinity for ElasticSearch. You can use templates inside because `tpl` function is called for rendering.
+  affinity: {}
+
+  # -- Set Pod topology spread constraints for ElasticSearch. You can use templates inside because `tpl` function is called for rendering. 
+  topologySpreadConstraints: {}
+
+  # -- Set Pods' Priority Class Name
+  priorityClassName: ""
+
   # -- Node sets. See official ElasticSearch documentation at:
   # https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-orchestration.html
   # if you specify node sets here the defaultNodeSet will not be used.
@@ -628,6 +651,15 @@ elasticsearch:
 kibana:
   # -- The ECK version to be used
   version: 8.2.3
+
+  # -- Set Pod (anti-) affinity for Kibana. You can use templates inside because `tpl` function is called for rendering.
+  affinity: {}
+
+  # -- Set Pod topology spread constraints for Kibana. You can use templates inside because `tpl` function is called for rendering. 
+  topologySpreadConstraints: {}
+
+  # -- Set Pods' Priority Class Name
+  priorityClassName: ""
 
   # -- The image that should be used.
   # By default ECK will use the official Elasticsearch images. 
